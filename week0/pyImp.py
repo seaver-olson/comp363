@@ -15,7 +15,7 @@ class Heap:
         self.array[-1], self.array[0] = self.array[0], self.array[-1]
         self.restoreRemove(0)
         return self.array.pop()
-    #Restores Heap Property after add()
+    #Restores Heap Property after add() Aka Bubble Up
     def restoreAdd(self,index : int) -> None:
         while index > 0:
             parent = (index-1)//2 #rounds to the same parent for left and right
@@ -24,7 +24,7 @@ class Heap:
                 index = parent
             else:
                 index = 0
-    #Restores Heap Property after remove()
+    #Restores Heap Property after remove() Aka Bubble Down
     def restoreRemove(self, index : int) -> None:
         count = len(self.array)-1#ON PURPOSE NOT AN ERROR I PROMISE
         while index < count:
