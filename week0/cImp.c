@@ -44,13 +44,47 @@ void addElement(Heap *heap, int element){
     }
 }
 
+int getChild(int index, char side){
+    return (side=='r' ? 2*index + 2 : 2*index + 1);
+}
+
+int removeRoot(Heap *heap){
+    int root = heap->array[0];
+    int curr = 0;
+
+    heap->array[0] = heap->array[heap->size-1];
+    heap->size--;
+    while (curr < heap->size){
+        int s = curr;
+        int left = getChild(curr, 'l');
+        int right = getChild(curr, 'r');
+        if (left < heap->size && heap->array[left] < heap->array[s]) s = left;
+
+        if (right < heap->size && heap->array[right] < heap->array[s]) s = right;
+        if (s != curr) {
+            int temp = heap->array[curr];
+            heap->array[curr] = heap->array[s];
+            heap->array[s] = temp;
+            curr = s;
+        } else {
+            curr = heap->size;
+        }
+    }
+    return root;
+}
+
+int peek(Heap *heap){
+    if (heap->size > 0) return heap->array[0];
+    return -1;
+}
+
 void displayHeap(Heap *heap){
     int size = sizeof(int);
     printf("Heap : [ ");
     for (int i = 0; i < heap->size; i++){
         printf("%d ", heap->array[i]);
     }
-    printf("]\n");
+    printf("]");
 }
 
 int main(){
@@ -62,6 +96,15 @@ int main(){
         addElement(heap, example[i]);
         printf("Added %d to heap successfully\n", example[i]);
         displayHeap(heap);
+        printf("\n");
+    }
+    
+    printf("===REMOVE TEST===\n");
+    //I do realize this means I would not be able to add -1 to the heap
+    while (peek(heap)!=-1){
+        int element = removeRoot(heap);
+        displayHeap(heap);
+        printf(" after removing %d\n", element);
     }
     return 0;
 }
