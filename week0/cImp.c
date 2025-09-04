@@ -40,10 +40,12 @@ void addElement(Heap *heap, int element){
     }
 }
 
+
 int getChild(int index, char side){
-    return (side=='r' ? 2*index + 2 : 2*index + 1);
+    return (side=='r' ? 2*index + 2 : 2*index + 1);//arg decides if the function returns the left or right child
 }
 
+//removes the root, swaps the last child with the root, decreases the size of the heap so root is out of memory, finally bubbles down
 int removeRoot(Heap *heap){
     int root = heap->array[0];
     int curr = 0;
@@ -69,11 +71,13 @@ int removeRoot(Heap *heap){
     return root;
 }
 
+//returns -1 if heap is empty otherwise returns smallest element in heap without removing it
 int peek(Heap *heap){
     if (heap->size > 0) return heap->array[0];
     return -1;
 }
 
+//helper function so I do not need to continuously do this
 void displayHeap(Heap *heap){
     int size = sizeof(int);
     printf("Heap : [ ");
@@ -83,6 +87,7 @@ void displayHeap(Heap *heap){
     printf("]");
 }
 
+//Note for Leo: Other than the malloc notification you will recieve the output should be the exact same as the python implementation if you want to verify that one and just test this one against it
 int main(){
     Heap *heap = HeapInit(1);
     int example[] = {999999,23,34,64,12,22,11,1,2,3,56,23,75};
