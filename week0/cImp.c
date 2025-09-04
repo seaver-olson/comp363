@@ -1,7 +1,3 @@
-/*
-Note to Leo - I have a few too many return statements sorry
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 
