@@ -2,14 +2,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define COUNT 4
-#define MAXEDGE 10
-#define EPROB .67// 6 7
+const int COUNT = 10;
+const int MAXEDGE = 10;
+const double EPROB =.67;// 6 7
+const double INFINITY = 1.0 / 0.0;
 
-double INFINITY = 1.0 / 0.0;
-
-double G[COUNT][COUNT];
-double T[COUNT][COUNT];
+double G[COUNT][COUNT];//invariant input
+double T[COUNT][COUNT];//output
 
 typedef struct {
     int source;
@@ -39,25 +38,17 @@ void generateGraph(double G[COUNT][COUNT]){
     }
 }
 
-void printGraph(){
+void printGraph(double X[COUNT][COUNT]){
     for (int i=0; i<COUNT;i++){
         printf("[ ");
         for (int j=0; j<COUNT;j++){
             //extra logic but makes the output so much cleaner
-            if (G[i][j] != INFINITY) printf("%d ", (int) G[i][j]);
+            if (X[i][j] != INFINITY) printf("%d ", (int) X[i][j]);
             else printf("\u221E ");//unicode for infinity
         }
         printf("]\n");
     }
 }
-
-int safeEdge(int u, int v){
-    for (int i=0;i<COUNT;i++){
-        if (G[u][i] < G[u][v]) return 0;
-    }
-    return 1;
-}
-
 
 void BMST(double G[COUNT][COUNT], double T[COUNT][COUNT]){
     
@@ -74,17 +65,46 @@ void BMST(double G[COUNT][COUNT], double T[COUNT][COUNT]){
 
     
     while (componentCount > 1){
-        for (int u = 0; u < COUNT; u++){
-            for (int v = 0; v < COUNT; v++){
-                if (G[u][v] != INFINITY && components[u] != components[v] && safeEdge(u,v)){
-                    int uComp = find(components, components[u]);
-                    int vComp = find(components, components[v]);
-                    if (uComp != vComp) {
+        Edge cheapest[COUNT];
+        for (int i=0; i<COUNT; i++){ 
+            cheapest[i].source = -1; 
+            cheapest[i].dest = -1; 
+        }
 
+        //get cheapest edge for each component
+        for (int u = 0; u < COUNT; u++){
+            int uComp = find(components, u);
+            for (int v = 0; v < COUNT; v++){
+                if (G[u][v] != INFINITY){
+                    int vComp = find(components, v);
+                    if (uComp != vComp ) {
+                        //if no source yet or new source is faster than old source
+                        if (cheapest[uComp].source == -1 || G[u][v] < G[cheapest[uComp].source][cheapest[uComp].dest]) {
+                            cheapest[uComp].source = u;
+                            cheapest[uComp].dest = v;
+                        }
                     }
                 }
             }  
         }
+
+        //add edges
+        for (int i=0;i<COUNT;i++){
+            if (cheapest[i].source != -1){
+                int u = cheapest[i].source;
+                int v = cheapest[i].dest;
+                int uComp = find(components, u);
+                int vComp = find(components, v);
+                if (uComp != vComp){
+                    T[u][v] = G[u][v];
+                    T[v][u] = G[u][v];
+                    components[vComp] = uComp;  // merge components
+                    componentCount--;
+                }
+            }
+        }
+
+
     }
 }
 
@@ -92,10 +112,12 @@ int main(){
     srand(time(0));
     generateGraph(G);
     printf("Input Graph = \n");
-    printGraph();
+    printGraph(G);
     printf("Minimum Spanning Tree: \n");
     BMST(G,T);
-    printGraph();
+    printGraph(T);
+    printf("Proof Input Graph still invariant:\n");
+    printGraph(G);
     return 0;
 }
 
@@ -105,3 +127,4 @@ int main(){
 //1 + 1/(n+1)
 
 //this is the reason I left this fix out, as n approaching infinity the speed up literally erases itself and becomes more of a burden if you try to take into account cleaning the input array after calculations
+//and then you told me G was invariant and I cant change it and I lost all hope either way and will now become a botany student
