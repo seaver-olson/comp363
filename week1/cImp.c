@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define COUNT 40
+#define COUNT 4
 #define MAXEDGE 10
 #define EPROB.67// 6 7
 double INFINITY = 1.0 / 0.0;
@@ -115,9 +115,17 @@ int main(){
     printGraph(G);
     printf("Minimum Spanning Tree: \n");
     BMST(G,T);
-    printGraph(T);
-    printf("Proof Input Graph still invariant:\n");
-    printGraph(G);
+    printf("MST edges:\n");
+    for (int i = 0; i < COUNT; i++) {
+        for (int j = i+1; j < COUNT; j++) { 
+            if (T[i][j] != INFINITY) {
+                printf("Edge %d - %d: weight %d\n", i, j, (int)T[i][j]);
+            }
+        }
+    }
+    //uncomment if u want proof of invariant holding up
+    //printf("Proof Input Graph still invariant:\n");
+    //printGraph(G);
     return 0;
 }
 
