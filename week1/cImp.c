@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <time.h>
 
-const int COUNT = 10;
-const int MAXEDGE = 10;
-const double EPROB =.67;// 6 7
-const double INFINITY = 1.0 / 0.0;
+#define COUNT 40
+#define MAXEDGE 10
+#define EPROB.67// 6 7
+double INFINITY = 1.0 / 0.0;
 
 double G[COUNT][COUNT];//invariant input
 double T[COUNT][COUNT];//output
@@ -44,7 +44,7 @@ void printGraph(double X[COUNT][COUNT]){
         for (int j=0; j<COUNT;j++){
             //extra logic but makes the output so much cleaner
             if (X[i][j] != INFINITY) printf("%d ", (int) X[i][j]);
-            else printf("\u221E ");//unicode for infinity
+            else printf("inf ");//unicode for infinity
         }
         printf("]\n");
     }
