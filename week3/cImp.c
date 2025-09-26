@@ -26,6 +26,7 @@ Node* create_node(int frequency, char symbol) {
     return node;
 }
 
+
 void set_left(struct Node *parent,struct Node *leftChild){
     parent->left = leftChild;
 }
@@ -52,6 +53,7 @@ void filter(char* input, char* output){
     }
     output[counter] = '\0';//terminate bit for end of string
 }
+
 
 void count_frequencies(const char* input, int freqs[ALPHABET_COUNT+1]){
     for (int i = 0; i < ALPHABET_COUNT+1; i++) {
@@ -89,6 +91,22 @@ Node* build_huffman(Node* forest[], int forest_size) {
     return forest[0];
 }
 
+//recursive code generator starting at root
+void generate_codes(Node* root, char* code, int depth){
+    if (root){
+        if (root->left == NULL && root->right == NULL){
+            code[depth]='\0';//terminates the code so C doesn't kill me
+            if (root->sym == ' ') printf("SPACE: %s\n", code);
+            else printf("%c: %s\n", root->sym, code);
+        }
+        code[depth] = '0';
+        generate_codes(root->left, code, depth+1);
+        code[depth] = '1';
+        generate_codes(root->right, code, depth+1);//right side scan
+    }
+}
+
+
 int main(){
     char filtered[size];
     filter(input_string, filtered);
@@ -107,7 +125,8 @@ int main(){
     if (freqs[ALPHABET_COUNT] > 0) forest[forest_size++] = create_node(freqs[ALPHABET_COUNT], ' ');
 
     Node* root = build_huffman(forest, forest_size);
-
+    char code[100];
+    generate_codes(root, code, 0);
 
     return 0;
 }
