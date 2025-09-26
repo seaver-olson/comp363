@@ -4,7 +4,7 @@
 
 #define COUNT 4
 #define MAXEDGE 10
-#define EPROB.67// 6 7
+#define EPROB .67// 6 7
 double INFINITY = 1.0 / 0.0;
 
 double G[COUNT][COUNT];//invariant input
@@ -44,7 +44,7 @@ void printGraph(double X[COUNT][COUNT]){
         for (int j=0; j<COUNT;j++){
             //extra logic but makes the output so much cleaner
             if (X[i][j] != INFINITY) printf("%d ", (int) X[i][j]);
-            else printf("inf ");//unicode for infinity
+            else printf("_ ");//unicode for infinity
         }
         printf("]\n");
     }

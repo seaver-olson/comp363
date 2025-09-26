@@ -1,0 +1,3 @@
+Set S with |s| = n
+|P(s)| = 2^|s|. 
+
