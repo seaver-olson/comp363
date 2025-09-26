@@ -68,13 +68,46 @@ void count_frequencies(const char* input, int freqs[ALPHABET_COUNT+1]){
     }
 }
 
+Node* build_huffman(Node* forest[], int forest_size) {
+    while (forest_size > 1){
+        //find smallest freq node in forest
+        int idx = find_min(forest, forest_size);
+        Node* min1 = forest[idx];
+        forest[idx] = forest[--forest_size];
+
+        // reuse idx for second min
+        idx = find_min(forest, forest_size);
+        Node* min2 = forest[idx];
+        forest[idx] = forest[--forest_size];
+
+        Node* parent = create_node(min1->freq + min2->freq, '\0');
+        set_left(parent, min1);
+        set_right(parent, min2);
+
+        forest[forest_size++] = parent;
+    }
+    return forest[0];
+}
+
 int main(){
     char filtered[size];
     filter(input_string, filtered);
+    printf("Filtered: %s\n", filtered);//filtered string check
+    //frequency counting and printing
     count_frequencies(filtered,freqs);
     for (int i = 0; i < ALPHABET_COUNT; i++){
         if (freqs[i] > 0) printf("%c: %d\n", 'A' + i, freqs[i]);
     }
     if (freqs[ALPHABET_COUNT] > 0) printf("SPACE: %d\n", freqs[ALPHABET_COUNT]);
+
+    Node* forest[TABLE_COUNT];
+    int forest_size = 0;
+    //basically Leo's init_forest() function that initializes a node for each non zero frequency letter + space at the end
+    for (int i = 0; i < ALPHABET_COUNT; i++) if (freqs[i] > 0) forest[forest_size++] = create_node(freqs[i], 'A' + i);
+    if (freqs[ALPHABET_COUNT] > 0) forest[forest_size++] = create_node(freqs[ALPHABET_COUNT], ' ');
+
+    Node* root = build_huffman(forest, forest_size);
+
+
     return 0;
 }
