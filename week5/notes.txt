@@ -1,0 +1,5 @@
+Match: 0 penalty 
+Mismatch: 5 penalty
+Gap: 1 penalty
+
+find alignment with the lowest total penalty
