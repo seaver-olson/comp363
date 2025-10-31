@@ -10,7 +10,6 @@
 
 
 
-
 ## Leo's assignment notes below
 - Monte-Carlo modeling of car traffic in a city
 - City is simulated as a grid of N x N rectilinear intersections

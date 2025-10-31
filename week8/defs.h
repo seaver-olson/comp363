@@ -5,7 +5,7 @@
 
 #define N 100//rows and cols (max 65535)
 
-#define TOTAL_TICKS = 1000//sim time in ticks
+#define TOTAL_TICKS 1000//sim time in ticks
 
 #define NORTH 0
 #define EAST 1
@@ -32,6 +32,7 @@
 
 #define link_index(x,y,dir) ((x*N+y)*4+dir)
 
+
 typedef struct {
     int32_t x, y;//implys a max N of 65535
 } Node_t;
@@ -42,26 +43,22 @@ typedef struct {
 } Car;
 
 typedef struct {
-    Car cars[IN_TRANSIT_CAP];
+    Car car;
+    uint16_t remaining_time;
+} CarInTransit;
+
+typedef struct {
+    CarInTransit cars[IN_TRANSIT_CAP];
     uint16_t count; 
 } TransitBuffer_t;
 
+typedef struct {
+    Car cars[QUEUE_CAP];
+    uint16_t count;
+} stopBuffer_t;//removed the extra uint16_t for simplicity
 
 typedef struct {
     Node_t from, to;
     TransitBuffer_t in_transit;
-    TransitBuffer_t stopped;
+    stopBuffer_t stopped;
 } Link_t;
-
-//direction helpers - optimize later
-uint8_t turn_right(uint8_t dir) {
-    return (dir + 1) % 4;
-}
-
-uint8_t opposite_dir(uint8_t dir) {
-    return (dir + 2) % 4;
-}
-
-uint8_t turn_left(uint8_t dir) {
-    return (dir + 3) % 4;
-}
