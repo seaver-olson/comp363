@@ -4,8 +4,9 @@
 
 //kahn vs the stack - how topological sorting can be obtained using kahn's algorithm
 #define N 6
-int visted[N] = {0};
-double enter_times[N] = {0};
+
+int visited[N] = {0};
+int time_counter;
 double leave_times[N] = {0};
 
 
@@ -21,7 +22,7 @@ int kahn(int graph[N][N], int topological_order[N]){
     //calculate in-degrees
     for (int i = 0; i < N; i++){
         for (int j = 0; j < N; j++){
-            if (graph[i][j] == 1) in_degree[j]++; //if there is an edge from i to j, increment in_degree of j
+            if (graph[i][j] >= 1) in_degree[j]++; //if there is an edge from i to j, increment in_degree of j
         }
     }
     //initialize sources stack
@@ -35,7 +36,7 @@ int kahn(int graph[N][N], int topological_order[N]){
         int current = sources[--source_count];//pop from stack
         topological_order[order_index++] = current;//add to topological order
         for (int neighbor = 0; neighbor < N; neighbor++){//each neighbor now has one less incoming edge
-            if (graph[current][neighbor] == 1){
+            if (graph[current][neighbor] >= 1){
                 in_degree[neighbor]--;
                 if (in_degree[neighbor] == 0){//if this neighbor has no more incoming edges
                     sources[source_count++] = neighbor;//it is now a source, push to stack
@@ -46,20 +47,34 @@ int kahn(int graph[N][N], int topological_order[N]){
     return 0;
 }
 
-void DFS(int v){
-    visted[v] = 1;
-    enter_times[v] = (double)clock() / CLOCKS_PER_SEC;
+void DFS(int v, int graph[N][N]){
+    visited[v] = 1;
+    
     for (int neighbor = 0; neighbor < N; neighbor++){
-        if (visted[neighbor] == 0){
-            DFS(neighbor);
+        if (graph[v][neighbor] >= 1 && visited[neighbor] == 0){
+            DFS(neighbor, graph);
         }
     }
-    leave_times[v] = (double)clock() / CLOCKS_PER_SEC;
+    leave_times[time_counter++] = v;//sorts by leave time
 }
 
 
-void process_topological_order(int status, int topological_order[N]){
-    if (status != 0){
+int dfs_topological_sort(int graph[N][N], int topological_order[N]){
+    time_counter = 0;
+    for (int i = 0; i < N; i++){
+        if (visited[i] == 0){
+            DFS(i, graph);
+        }
+    }
+
+    for (int i = 0; i < N; i++) {//reverse leave time = topological order
+        topological_order[i] = leave_times[N - 1 - i];//as I gets higher, leave times get lower 
+    }
+    return 0;
+}
+
+void process_topological_order(int status_code, int topological_order[N]){
+    if (status_code != 0){
         printf("Error in topological sort\n");
         return;
     }
@@ -69,6 +84,7 @@ void process_topological_order(int status, int topological_order[N]){
     }
     printf("\n");
 }
+
 
 int main(){
     int G1[N][N] = {
@@ -90,10 +106,15 @@ int main(){
     };
 
     int topological_order[N];//to store the result (C cant return arrays)
-
+    //kahn vs dfs G1
     process_topological_order(kahn(G1, topological_order), topological_order);
+    for (int i = 0; i < N; i++) visited[i] = 0;
+    process_topological_order(dfs_topological_sort(G1, topological_order), topological_order);
+    for (int i = 0; i < N; i++) visited[i] = 0;
+    //kahn vs dfs G2
     process_topological_order(kahn(G2, topological_order), topological_order);
-    
+    for (int i = 0; i < N; i++) visited[i] = 0;
+    process_topological_order(dfs_topological_sort(G2, topological_order), topological_order);
     return 0;
 
 }
