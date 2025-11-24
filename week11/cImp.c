@@ -46,36 +46,39 @@ void generate_random_string(char* string, int length, float distortion_prob){
 }
 
 void can_segment_dp(const char* string, char* outSegs[NUM_OF_WORDS]){
-    int dp[NUM_OF_WORDS+1] = {0};
-    dp[0]=1;
-    for (int i = 1; i <= NUM_OF_TRIALS; i++){
-        int j = 0;
-        while (j < i && !dp[i]){
-            if (!dp[j]) {
-                j++;
-                continue;
+    int string_length = strlen(string);
+    int parent[string_length + 1];
+    int dp[string_length+1];
+    memset(dp, 0, sizeof(dp));
+
+    dp[0]=1;//empty case
+    for (int i = 1; i <= string_length; i++){
+        for (int j = 0; j < i; j++){
+            if (dp[j]){
+                int len = i - j;
+                char* substr = (char*)malloc(sizeof(char) * (len + 1));
+                strncpy(substr, &string[j], len);
+                substr[len] = '\0';
+                if (is_word(substr)){
+                    dp[i] = 1;
+                    parent[i] = j;
+                    free(substr);
+                    break;
+                }
+                free(substr);
             }
-            int len = i - j;
-            char* slice = malloc(len + 1);
-            memcpy(slice, string + j, len);
-            slice[len] = '\0';
-            if (is_word(slice)) {
-                dp[i] = 1;
-                outSegs[i - 1] = slice;
-                break;
-            }
-            j++;
-            free(slice);
         }
     }
+
 }
+
 
 int main(){
     srand(time(0));
     while (current_trial < NUM_OF_TRIALS){
         current_trial++;
         char* outSegs[NUM_OF_WORDS];
-        char* trial_string = (char*)malloc(sizeof(char) * NUM_OF_WORDS * 20);//okay i didnt really know what to do here so i just assumed max word length is 20 for malloc
+        char* trial_string = (char*)malloc(sizeof(char) * NUM_OF_WORDS * 20);
         generate_random_string(trial_string, NUM_OF_WORDS, DISTORTION_PROB);
         printf("Trial %d: Testing string \"%s\"\n", current_trial, trial_string);
         can_segment_dp(trial_string, outSegs);
@@ -86,7 +89,6 @@ int main(){
                 free(outSegs[i]);
             }
         }
-        printf("There are %svalid segmentations.\n", outSegs[NUM_OF_WORDS - 1] ? "" : "no ");
         printf("\n");
         free(trial_string);
     }
