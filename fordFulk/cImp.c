@@ -39,10 +39,9 @@ void find_path(int graph[NODE_COUNT][NODE_COUNT], int source, int sink, int path
         *path_length = 0;
         int current = sink;
         while (current != -1){
-            path[*path_length++] = current;//add current node to path
-            current = parent[current];//go to parent
+            path[(*path_length)++] = current;
+            current = parent[current];
         }
-
         //reverse path
         for (int i = 0; i < *path_length / 2; i++){
             int temp = path[i];
