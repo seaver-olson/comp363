@@ -87,7 +87,27 @@ int get_sink(int graph[NODE_COUNT][NODE_COUNT]){
     return sink;
 }
 
-int ford_fulkerson(int graph[NODE_COUNT][NODE_COUNT], int source, int sink){
+//reachable- nodes from source in residual graph
+void find_reachable(int residual_graph[NODE_COUNT][NODE_COUNT], int source, int reachable[NODE_COUNT]){
+    for (int i = 0; i < NODE_COUNT; i++) reachable[i] = 0;//all as not reachable
+    int stack[NODE_COUNT];
+    int stack_top = 0;
+
+    stack[stack_top++] = source;//source moved to stack
+    reachable[source] = 1;//source is always reachable
+    while (stack_top > 0){
+        int current = stack[--stack_top];//pop from stack
+        for (int neighbor = 0; neighbor < NODE_COUNT; neighbor++){
+            if (residual_graph[current][neighbor] > 0 && reachable[neighbor] == 0){//if there is capacity and not visited
+                stack[stack_top++] = neighbor;//push to stack
+                reachable[neighbor] = 1;//mark reachable
+            }
+        }
+    }
+}
+
+int ford_fulkerson(int graph[NODE_COUNT][NODE_COUNT], int source, int sink, int* cut_size){
+
     int residual_graph[NODE_COUNT][NODE_COUNT];
     for (int i = 0; i < NODE_COUNT; i++){
         for (int j = 0; j < NODE_COUNT; j++){
@@ -95,8 +115,8 @@ int ford_fulkerson(int graph[NODE_COUNT][NODE_COUNT], int source, int sink){
         }
     }
 
-
     int max_flow = 0;
+    *cut_size = 0;
     //vars for path finding
     int path[NODE_COUNT];
     int path_length = 0;
@@ -124,6 +144,25 @@ int ford_fulkerson(int graph[NODE_COUNT][NODE_COUNT], int source, int sink){
         max_flow += min_cap;//add to max flow
         find_path(residual_graph, source, sink, path, &path_length);//get new path
     }
+
+    find_reachable(residual_graph, source, path);//reuse path array for less memory usage
+    printf("Reachable nodes from source in residual graph: ");
+    for (int i = 0; i < NODE_COUNT; i++){
+        if (path[i] == 1) printf("%d ", i);
+    }
+    printf("\n");
+    //cut edges works by= finding edges from reachable to non-reachable nodes and cuts them and sums caps
+    for (int i = 0; i < NODE_COUNT; i++){
+        if (path[i] == 1){//if reachable
+            for (int j = 0; j < NODE_COUNT; j++){
+                if (path[j] == 0 && graph[i][j] > 0){//j not reachable but i is
+                    (*cut_size) += graph[i][j];//add cut edge capacity
+                    printf("Cut edge: %d -> %d with capacity %d\n", i, j, graph[i][j]);
+                }
+            }
+        }
+    }
+    printf("Cut size: %d\n", *cut_size);
     return max_flow;
 }
 
@@ -135,10 +174,11 @@ int main(){
         {0,  0,  0,  0,  8},
         {0,  0,  0,  0,  0}
     };
+    int cut_size = 0;
     int source = get_source(residual_graph);
     int sink = get_sink(residual_graph);
     printf("Source: %d, Sink: %d\n", source, sink);
-    int max_flow = ford_fulkerson(residual_graph, source, sink);
+    int max_flow = ford_fulkerson(residual_graph, source, sink, &cut_size);
     printf("Max Flow: %d\n", max_flow);
     return 0;
 }
